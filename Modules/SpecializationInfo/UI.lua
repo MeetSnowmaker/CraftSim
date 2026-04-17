@@ -9,7 +9,7 @@ local f = GUTIL:GetFormatter()
 ---@class CraftSim.SPECIALIZATION_INFO.UI
 CraftSim.SPECIALIZATION_INFO.UI = {}
 
-local print = CraftSim.DEBUG:RegisterDebugID("Modules.SpecializationInfo.UI")
+local Logger = CraftSim.DEBUG:RegisterLogger("SpecializationInfo.UI")
 
 function CraftSim.SPECIALIZATION_INFO.UI:Init()
     local sizeX = 290
@@ -35,7 +35,7 @@ function CraftSim.SPECIALIZATION_INFO.UI:Init()
         offsetX = offsetX,
         offsetY = offsetY,
         backdropOptions = CraftSim.CONST.DEFAULT_BACKDROP_OPTIONS,
-        onCloseCallback = CraftSim.CONTROL_PANEL:HandleModuleClose("MODULE_SPEC_INFO"),
+        onCloseCallback = CraftSim.MODULES:HandleModuleClose("MODULE_SPEC_INFO"),
         frameTable = CraftSim.INIT.FRAMES,
         frameConfigTable = CraftSim.DB.OPTIONS:Get("GGUI_CONFIG"),
         frameStrata = CraftSim.CONST.MODULES_FRAME_STRATA,
@@ -59,7 +59,7 @@ function CraftSim.SPECIALIZATION_INFO.UI:Init()
         offsetX = offsetX,
         offsetY = offsetY,
         backdropOptions = CraftSim.CONST.DEFAULT_BACKDROP_OPTIONS,
-        onCloseCallback = CraftSim.CONTROL_PANEL:HandleModuleClose("MODULE_SPEC_INFO"),
+        onCloseCallback = CraftSim.MODULES:HandleModuleClose("MODULE_SPEC_INFO"),
         frameTable = CraftSim.INIT.FRAMES,
         frameConfigTable = CraftSim.DB.OPTIONS:Get("GGUI_CONFIG"),
         frameStrata = CraftSim.CONST.MODULES_FRAME_STRATA,
@@ -310,11 +310,10 @@ function CraftSim.SPECIALIZATION_INFO.UI:HookSpecNodeTooltips()
     specNodeTooltipHooked = true
 
     EventRegistry:RegisterCallback("ProfessionSpecs.SpecPathEntered", function(configID, pathID)
-                
         local nodeID = pathID
 
         local playerUID = CraftSim.UTIL:GetPlayerCrafterUID()
-            
+
         local label = CraftSim.LOCAL:GetText("SPECIALIZATION_INFO_TOOLTIP_LABEL")
         local crafterUIDRankMap = CraftSim.DB.CRAFTER:GetCrafterUIDsWithNodeActive(nodeID, playerUID)
         if next(crafterUIDRankMap) then

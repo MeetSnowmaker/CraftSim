@@ -13,7 +13,7 @@ CraftSim.RECIPE_INFO     = CraftSim.RECIPE_INFO
 ---@class CraftSim.RECIPE_INFO.UI
 CraftSim.RECIPE_INFO.UI  = {}
 
-local print              = CraftSim.DEBUG:RegisterDebugID("Modules.RecipeInfo.UI")
+local Logger              = CraftSim.DEBUG:RegisterLogger("RecipeInfo.UI")
 
 local NAME_COLUMN_WIDTH  = 130
 local VALUE_COLUMN_WIDTH = 180
@@ -191,7 +191,7 @@ function CraftSim.RECIPE_INFO.UI:Init()
         closeable          = true,
         moveable           = true,
         backdropOptions    = CraftSim.CONST.DEFAULT_BACKDROP_OPTIONS,
-        onCloseCallback    = CraftSim.CONTROL_PANEL:HandleModuleClose("MODULE_AVERAGE_PROFIT"),
+        onCloseCallback    = CraftSim.MODULES:HandleModuleClose("MODULE_AVERAGE_PROFIT"),
         frameTable         = CraftSim.INIT.FRAMES,
         frameConfigTable   = CraftSim.DB.OPTIONS:Get("GGUI_CONFIG"),
         frameStrata        = CraftSim.CONST.MODULES_FRAME_STRATA,
@@ -215,7 +215,7 @@ function CraftSim.RECIPE_INFO.UI:Init()
         closeable          = true,
         moveable           = true,
         backdropOptions    = CraftSim.CONST.DEFAULT_BACKDROP_OPTIONS,
-        onCloseCallback    = CraftSim.CONTROL_PANEL:HandleModuleClose("MODULE_AVERAGE_PROFIT"),
+        onCloseCallback    = CraftSim.MODULES:HandleModuleClose("MODULE_AVERAGE_PROFIT"),
         frameTable         = CraftSim.INIT.FRAMES,
         frameConfigTable   = CraftSim.DB.OPTIONS:Get("GGUI_CONFIG"),
         frameStrata        = CraftSim.CONST.MODULES_FRAME_STRATA,

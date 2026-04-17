@@ -13,7 +13,7 @@ local GUTIL = CraftSim.GUTIL
 CraftSim.PRICING.frame = nil
 CraftSim.PRICING.frameWO = nil
 
-local print = CraftSim.DEBUG:RegisterDebugID("Modules.Pricing.UI")
+local Logger = CraftSim.DEBUG:RegisterLogger("Pricing.UI")
 local f = CraftSim.GUTIL:GetFormatter()
 local L = CraftSim.UTIL:GetLocalizer()
 
@@ -40,7 +40,7 @@ function CraftSim.PRICING.UI:Init()
         closeable = true,
         moveable = true,
         backdropOptions = CraftSim.CONST.DEFAULT_BACKDROP_OPTIONS,
-        onCloseCallback = CraftSim.CONTROL_PANEL:HandleModuleClose("MODULE_PRICING"),
+        onCloseCallback = CraftSim.MODULES:HandleModuleClose("MODULE_PRICING"),
         frameTable = CraftSim.INIT.FRAMES,
         frameConfigTable = CraftSim.DB.OPTIONS:Get("GGUI_CONFIG"),
         frameStrata = CraftSim.CONST.MODULES_FRAME_STRATA,
@@ -63,7 +63,7 @@ function CraftSim.PRICING.UI:Init()
         closeable = true,
         moveable = true,
         backdropOptions = CraftSim.CONST.DEFAULT_BACKDROP_OPTIONS,
-        onCloseCallback = CraftSim.CONTROL_PANEL:HandleModuleClose("MODULE_PRICING"),
+        onCloseCallback = CraftSim.MODULES:HandleModuleClose("MODULE_PRICING"),
         frameTable = CraftSim.INIT.FRAMES,
         frameConfigTable = CraftSim.DB.OPTIONS:Get("GGUI_CONFIG"),
         frameStrata = CraftSim.CONST.MODULES_FRAME_STRATA,
@@ -625,7 +625,7 @@ function CraftSim.PRICING:UpdateDisplay(recipeData)
         costOptimizationFrame = CraftSim.PRICING.frame
     end
 
-    print("Pricing - Reagent List Update", false, true)
+    Logger:LogDebug("Pricing - Reagent List Update", false, true)
 
     costOptimizationFrame.content.craftingCostsValue:SetText(CraftSim.UTIL:FormatMoney(
         recipeData.priceData.craftingCosts))
@@ -785,8 +785,8 @@ function CraftSim.PRICING.UI:UpdateResultItemsList(recipeData, costOptimizationF
                 local avgCraftingCostPerItem = avgCraftingCost / averageYield
                 avgCostColumn.text:SetText(CraftSim.UTIL:FormatMoney(avgCraftingCostPerItem))
 
-                local itemCount = C_Item.GetItemCount(itemLink, true, false, true) or 0
-                local ahCount = CraftSim.PRICE_SOURCE:GetAuctionAmount(itemLink) or 0
+                local itemCount = CraftSim.INVENTORY_SOURCE:GetInventoryCount(itemLink) or 0
+                local ahCount = CraftSim.INVENTORY_SOURCE:GetAuctionAmount(itemLink) or 0
 
                 if ahCount > 0 then
                     invColumn.text:SetText(itemCount .. "/" .. ahCount)

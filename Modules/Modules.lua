@@ -10,7 +10,7 @@ local GUTIL = CraftSim.GUTIL
 local f = GUTIL:GetFormatter()
 local L = CraftSim.UTIL:GetLocalizer()
 
-local print = CraftSim.DEBUG:RegisterDebugID("Modules")
+local Logger = CraftSim.DEBUG:RegisterLogger("Modules")
 
 ---@type CraftSim.RecipeData?
 CraftSim.MODULES.recipeData = nil
@@ -94,6 +94,10 @@ end
 
 --- Updates only the Craft Queue "add work orders" enabled state (near table or Crafting Orders tab available).
 function CraftSim.MODULES:RefreshAddWorkOrdersButtonState()
+	-- do not alter state if we are currently in a queueing process
+	if CraftSim.CRAFTQ.queuingWorkOrders then
+		return
+	end
 	local craftQ = CraftSim.CRAFTQ.frame
 	if not craftQ or not craftQ.content or not craftQ.content.queueTab or not craftQ.content.queueTab.content then
 		return
@@ -108,20 +112,20 @@ end
 ---@return CraftSim.RecipeData? recipeData
 function CraftSim.MODULES:GetRecipeDataFromVisibleRecipe()
 	local recipeInfo = C_TradeSkillUI.GetRecipeInfo(CraftSim.INIT.visibleRecipeID)
-	
+
 	if not recipeInfo then
 		return nil
 	end
 
 	local schematicForm = CraftSim.UTIL:GetSchematicFormByVisibility()
 	if not schematicForm then
-		print("CraftSim MODULES: No SchematicForm Visible")
+		Logger:LogDebug("CraftSim MODULES: No SchematicForm Visible")
 		return nil
 	end
 
 	local currentTransaction = schematicForm:GetTransaction()
 	if not currentTransaction then
-		print("CraftSim MODULES: SchematicForm without transaction!")
+		Logger:LogDebug("CraftSim MODULES: SchematicForm without transaction!")
 		return nil
 	end
 
@@ -144,6 +148,13 @@ function CraftSim.MODULES:GetRecipeDataFromVisibleRecipe()
 	end
 
 	return nil
+end
+
+---@param moduleOption CraftSim.GENERAL_OPTIONS
+function CraftSim.MODULES:HandleModuleClose(moduleOption)
+	return function()
+		CraftSim.DB.OPTIONS:Save(moduleOption, false)
+	end
 end
 
 --- Recalculates and updates visibility of all modules based on the currently visible recipe and the options for the modules
@@ -175,7 +186,7 @@ function CraftSim.MODULES:UpdateUI()
 	CraftSim.SIMULATION_MODE.UI.NO_WORKORDER.toggleButton:Hide()
 
 	if C_TradeSkillUI.IsNPCCrafting() or C_TradeSkillUI.IsRuneforging() or C_TradeSkillUI.IsTradeSkillLinked() or C_TradeSkillUI.IsTradeSkillGuild() then
-		print("Hiding all modules because of crafting context (NPC crafting, Runeforging, Linked or Guild Recipe)")
+		Logger:LogDebug("Hiding all modules because of crafting context (NPC crafting, Runeforging, Linked or Guild Recipe)")
 		CraftSim.MODULES:Hide()
 		return
 	end
@@ -194,7 +205,7 @@ function CraftSim.MODULES:UpdateUI()
 
 	local exportMode = CraftSim.UTIL:GetExportModeByVisibility()
 
-	print("Export Mode: " .. tostring(exportMode))
+	Logger:LogDebug("Export Mode: " .. tostring(exportMode))
 
 	if CraftSim.SIMULATION_MODE.isActive and CraftSim.SIMULATION_MODE.recipeData then
 		CraftSim.MODULES.recipeData = CraftSim.SIMULATION_MODE.recipeData
@@ -205,7 +216,7 @@ function CraftSim.MODULES:UpdateUI()
 	local recipeData = CraftSim.MODULES.recipeData
 
 	if not recipeData then
-		print("No recipe data found for visible recipe!")
+		Logger:LogDebug("No recipe data found for visible recipe!")
 		CraftSim.MODULES:Hide(true, true)
 		return
 	end

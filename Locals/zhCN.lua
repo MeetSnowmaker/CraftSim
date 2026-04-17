@@ -672,7 +672,7 @@ function CraftSim.LOCAL_CN:GetData()
         CRAFT_QUEUE_RESTOCK_FAVORITES_QUEUE_MAIN_PROFESSIONS_TOOLTIP = "启用后，CraftSim 将同时处理当前角色的两种主专业",
         CRAFT_QUEUE_RESTOCK_FAVORITES_OFFSET_QUEUE_AMOUNT_LABEL = "偏移队列数量：",
         CRAFT_QUEUE_RESTOCK_FAVORITES_OFFSET_QUEUE_AMOUNT_TOOLTIP = "始终将指定数量添加到排队制造的数量中",
-        CRAFT_QUEUE_RESTOCK_FAVORITES_AUTO_SHOPPING_LIST = "扫描后自动创建购物清单",
+        CRAFT_QUEUE_RESTOCK_FAVORITES_AUTO_SHOPPING_LIST = "队列操作后自动创建购物清单",
         CRAFT_QUEUE_CRAFT_BUTTON_ROW_LABEL_WRONG_PROFESSION = "专业错误",
         CRAFT_QUEUE_CRAFT_BUTTON_ROW_LABEL_ON_COOLDOWN = "冷却中",
         CRAFT_QUEUE_RECIPE_REQUIREMENTS_HEADER = "状态",
@@ -754,16 +754,13 @@ function CraftSim.LOCAL_CN:GetData()
         CRAFT_QUEUE_ORDER_CUSTOMER = "\n\n订单发布人：",
         CRAFT_QUEUE_ORDER_MINIMUM_QUALITY = "\n最低品质：",
         CRAFT_QUEUE_ORDER_REWARDS = "\n奖励：",
-        CRAFT_QUEUE_RESTOCK_FAVORITES_OPTIONS_AUTO_SHOPPING_LIST = "启用后，CraftSim 扫描后会自动创建购物清单。",
+        CRAFT_QUEUE_RESTOCK_FAVORITES_OPTIONS_AUTO_SHOPPING_LIST = "启用后，CraftSim 会在队列操作后自动创建购物清单。",
         CRAFT_QUEUE_IGNORE_SPARK_RECIPES_CHECKBOX_LABEL = "忽略" .. f.e("火花") .. "配方",
         CRAFT_QUEUE_IGNORE_SPARK_RECIPES_CHECKBOX_TOOLTIP = "忽略需要火花材料的配方",
         CRAFT_QUEUE_MENU_AUTO_SHOW = "当配方加入制造队列后" .. f.g("自动打开"),
         CRAFT_QUEUE_MENU_INGENUITY_IGNORE = f.r("忽略") .. f.gold("奇思触发") .. "时的队列数量减少",
         CRAFT_QUEUE_MENU_DEQUEUE_CONCENTRATION = "在" .. f.gold("专注") .. "全用完后" .. f.r("移除"),
         CRAFT_QUEUE_MENU_DEQUEUE_CONCENTRATION_TOOLTIP = "当剩余的专注不足以继续制作时，自动移除已制作的配方。",
-        CRAFT_QUEUE_HELP = f.bb("左键点击") .. " .. 跳转到配方\n" ..
-            f.bb("右键点击") .. " .. 打开配方选项\n" ..
-            f.bb("中键点击") .. " .. 从队列中移除配方",
 
         -- craft buffs
 

@@ -19,7 +19,7 @@ CraftSimNO_PRICE_API = { name = "None" }
 CraftSim.PRICE_APIS.available = true
 
 local systemPrint = print
-local print = CraftSim.DEBUG:RegisterDebugID("Data.PriceAPI")
+local Logger = CraftSim.DEBUG:RegisterLogger("PriceAPIs")
 
 function CraftSim.PRICE_API:InitPriceSource()
     local loadedSources = CraftSim.PRICE_APIS:GetAvailablePriceSourceAddons()
@@ -72,7 +72,7 @@ end
 function CraftSim.PRICE_APIS:GetAvailablePriceSourceAddons()
     local loadedAddons = {}
     for _, addonName in pairs(CraftSim.CONST.SUPPORTED_PRICE_API_ADDONS) do
-        if select(2, C_AddOns.IsAddOnLoaded(addonName)) then
+        if C_AddOns.IsAddOnLoaded(addonName) then
             table.insert(loadedAddons, addonName)
         end
     end
@@ -81,7 +81,7 @@ end
 
 function CraftSim.PRICE_APIS:IsPriceApiAddonLoaded()
     for _, name in pairs(CraftSim.CONST.SUPPORTED_PRICE_API_ADDONS) do
-        if select(2, C_AddOns.IsAddOnLoaded(name)) then
+        if C_AddOns.IsAddOnLoaded(name) then
             return true
         end
     end
@@ -98,10 +98,10 @@ function CraftSim.PRICE_APIS:IsAddonPriceApiAddon(addon_name)
 end
 
 function CraftSim.PRICE_APIS:InitAvailablePriceAPI()
-    local _, tsmLoaded = C_AddOns.IsAddOnLoaded(CraftSimTSM.name)
-    local _, auctionatorLoaded = C_AddOns.IsAddOnLoaded(CraftSimAUCTIONATOR.name)
-    local _, recrystallizeLoaded = C_AddOns.IsAddOnLoaded(CraftSimRECRYSTALLIZE.name)
-    local _, exchangeLoaded = C_AddOns.IsAddOnLoaded(CraftSimEXCHANGE.name)
+    local tsmLoaded = C_AddOns.IsAddOnLoaded(CraftSimTSM.name)
+    local auctionatorLoaded = C_AddOns.IsAddOnLoaded(CraftSimAUCTIONATOR.name)
+    local recrystallizeLoaded = C_AddOns.IsAddOnLoaded(CraftSimRECRYSTALLIZE.name)
+    local exchangeLoaded = C_AddOns.IsAddOnLoaded(CraftSimEXCHANGE.name)
     if tsmLoaded then
         CraftSim.PRICE_API = CraftSimTSM
     elseif auctionatorLoaded then
@@ -111,33 +111,12 @@ function CraftSim.PRICE_APIS:InitAvailablePriceAPI()
     elseif exchangeLoaded then
         CraftSimPriceAPI = CraftSimEXCHANGE
     else
-        print("CraftSim: No supported price source found")
-        print("Supported addons are: ")
+        Logger:LogDebug("CraftSim: No supported price source found")
+        Logger:LogDebug("Supported addons are: ")
         for _, name in pairs(CraftSim.CONST.SUPPORTED_PRICE_API_ADDONS) do
-            print(name)
+            Logger:LogDebug(name)
         end
     end
-end
-
----@param idOrLink? number | string
----@return number? auctionAmount
-function CraftSimTSM:GetAuctionAmount(idOrLink)
-    if not idOrLink then
-        return
-    end
-    if type(idOrLink) == 'number' then
-        return CraftSimTSM:GetAuctionAmountByItemID(idOrLink)
-    else
-        return CraftSimTSM:GetAuctionAmountByItemLink(idOrLink)
-    end
-end
-
-function CraftSimTSM:GetAuctionAmountByItemID(itemID)
-    return TSM_API.GetAuctionQuantity("i:" .. itemID)
-end
-
-function CraftSimTSM:GetAuctionAmountByItemLink(itemLink)
-    return TSM_API.GetAuctionQuantity(TSM_API.ToItemString(itemLink))
 end
 
 ---@param itemID string
@@ -169,11 +148,11 @@ function CraftSimTSM:GetMinBuyoutByTSMItemString(tsmItemString, isReagent)
     local vendorBuyPrice, error = TSM_API.GetCustomPriceValue(vendorBuy, tsmItemString)
 
     if vendorBuyPrice == nil then
-        --print("found no vendor buy price for: " .. itemLink)
+        --Logger:LogDebug("found no vendor buy price for: " .. itemLink)
         local minBuyout, error = TSM_API.GetCustomPriceValue(minBuyoutPriceSourceKey, tsmItemString)
         return minBuyout
     else
-        --print("found vendor buy price for: " .. itemLink)
+        --Logger:LogDebug("found vendor buy price for: " .. itemLink)
         return vendorBuyPrice
     end
 end
@@ -194,8 +173,8 @@ function CraftSimTSM:GetItemSaleRate(itemLink)
     local tsmItemString = TSM_API.ToItemString(itemLink)
     local salerate, error = TSM_API.GetCustomPriceValue(key, tsmItemString)
     if error then
-        print(f.r("CraftSimTSM:GetItemSaleRate Error: " .. tostring(error)), false, true)
-        print("itemLink: " .. tostring(itemLink))
+        Logger:LogDebug(f.r("CraftSimTSM:GetItemSaleRate Error: " .. tostring(error)), false, true)
+        Logger:LogDebug("itemLink: " .. tostring(itemLink))
     end
     salerate = salerate or 0 -- nil safe
     return salerate / 1000
@@ -323,18 +302,18 @@ function CraftSimTSM:GetExpectedDeposit(recipeData)
     if expression and expression ~= "" then
         local ok, result = pcall(TSM_API.GetCustomPriceValue, expression, tsmStr)
         if not ok then
-            print("GetExpectedDeposit: TSM_API.GetCustomPriceValue error for expression '",
+            Logger:LogDebug("GetExpectedDeposit: TSM_API.GetCustomPriceValue error for expression '",
                 tostring(expression), "' and item '", tostring(tsmStr), "': ", tostring(result))
             deposit = nil
         else
             deposit = result
             if deposit == nil then
-                print("GetExpectedDeposit: TSM expression returned nil for '",
+                Logger:LogDebug("GetExpectedDeposit: TSM expression returned nil for '",
                     tostring(expression), "' and item '", tostring(tsmStr), "'")
             end
         end
     else
-        print("GetExpectedDeposit: No TSM deposit expression configured; using 0 for item '", tostring(tsmStr), "'")
+        Logger:LogDebug("GetExpectedDeposit: No TSM deposit expression configured; using 0 for item '", tostring(tsmStr), "'")
         deposit = nil
     end
     depositCache[tsmStr] = { value = deposit, t = now }

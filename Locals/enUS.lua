@@ -402,7 +402,7 @@ function CraftSim.LOCAL_EN:GetData()
         RECIPE_SCAN_CONCENTRATION_VALUE_HEADER = "C. Value",
         RECIPE_SCAN_CONCENTRATION_COST_HEADER = "C. Cost",
         RECIPE_SCAN_TOP_GEAR_HEADER = "Top Gear",
-        RECIPE_SCAN_INV_AH_HEADER = "Inv/AH",
+        RECIPE_SCAN_INV_AH_HEADER = "Inv",
         RECIPE_SCAN_SORT_BY_MARGIN = "Sort by Profit %",
         RECIPE_SCAN_SORT_BY_MARGIN_TOOLTIP =
         "Sort the profit list by profit relative to crafting costs.\n(Requires a new scan)",
@@ -449,6 +449,7 @@ function CraftSim.LOCAL_EN:GetData()
         RECIPE_SCAN_INCLUDE_SOULBOUND_ITEMS = "Include " .. f.e("Soulbound") .. " Items",
         RECIPE_SCAN_INCLUDE_UNLEARNED_RECIPES = "Include " .. f.r("Unlearned") .. " Recipes",
         RECIPE_SCAN_INCLUDE_GEAR_LABEL = "Include Gear",
+        RECIPE_SCAN_INV_COUNT_INCLUDE_ALTS_LABEL = "Include " .. f.bb("Alt") .. " Inventory",
         RECIPE_SCAN_REAGENT_ALLOCATION = "Reagent Allocation",
         RECIPE_SCAN_REAGENT_ALLOCATION_Q1 = "All Q1",
         RECIPE_SCAN_REAGENT_ALLOCATION_Q2 = "All Q2",
@@ -503,6 +504,14 @@ function CraftSim.LOCAL_EN:GetData()
         RECIPE_SCAN_UPDATE_LAST_CRAFTING_COST = "Update " .. f.bb("Last Crafting Cost") .. " DB",
         RECIPE_SCAN_UPDATE_LAST_CRAFTING_COST_TOOLTIP = "If enabled, the " .. f.bb("Last Crafting Cost") ..
             " database is updated for each scanned recipe.\n\nThis allows querying the last known average crafting cost per item via the CraftSim API.",
+        RECIPE_SCAN_ONLY_CRAFTLISTS_BUTTON = "Only Craft Lists",
+        RECIPE_SCAN_ONLY_CRAFTLISTS_TOOLTIP =
+        "When enabled, all other filters are ignored and only the selected craft lists are scanned using their respective optimization options.",
+        RECIPE_SCAN_CRAFTLISTS_SELECT_TITLE = "Select Craft Lists to Scan:",
+        RECIPE_SCAN_CRAFTLISTS_NO_LISTS = f.grey("No Craft Lists created yet"),
+        CRAFT_LISTS_OPTIONS_TOOLTIP_HEADER = f.bb("Options") .. ":",
+        CRAFT_LISTS_OPTIONS_TOOLTIP_RESTOCK_HEADER = f.bb("Restock Options") .. ":",
+        CRAFT_LISTS_OPTIONS_ONLY_PROFITABLE = "Only Profitable",
 
         -- Recipe Top Gear
         TOP_GEAR_TITLE = "CraftSim Top Gear",
@@ -537,6 +546,12 @@ function CraftSim.LOCAL_EN:GetData()
         OPTIONS_GENERAL_REMEMBER_LAST_RECIPE = "Remember Last Recipe",
         OPTIONS_GENERAL_REMEMBER_LAST_RECIPE_TOOLTIP = "Reopen last selected recipe when opening the crafting window",
         OPTIONS_GENERAL_SUPPORTED_PRICE_SOURCES = "Supported Price Sources:",
+        OPTIONS_GENERAL_INVENTORY_SOURCE = "Inventory Source",
+        OPTIONS_GENERAL_CURRENT_INVENTORY_SOURCE = "Current Inventory Source: ",
+        OPTIONS_GENERAL_NO_INVENTORY_SOURCE = "No Supported Inventory Addon loaded!",
+        OPTIONS_GENERAL_SUPPORTED_INVENTORY_SOURCES = "Supported Inventory Sources:",
+        OPTIONS_GENERAL_SHOW_TUTORIAL_BUTTONS_CHECKBOX = "Show Module Tutorial Buttons",
+        OPTIONS_GENERAL_SHOW_TUTORIAL_BUTTONS_TOOLTIP = "Show tutorial buttons for each module",
         OPTIONS_PERFORMANCE_RAM = "Enable RAM cleanup while crafting",
         OPTIONS_PERFORMANCE_RAM_CRAFTS = "Crafts",
         OPTIONS_PERFORMANCE_RAM_TOOLTIP =
@@ -718,6 +733,9 @@ function CraftSim.LOCAL_EN:GetData()
         CRAFT_QUEUE_ADD_WORK_ORDERS_ONLY_PROFITABLE_CHECKBOX = "Only " .. f.g("Profitable"),
         CRAFT_QUEUE_ADD_WORK_ORDERS_ONLY_PROFITABLE_TOOLTIP = "Only queue work orders with expected positive profit",
         CRAFT_QUEUE_WORK_ORDER_TYPE_BUTTON = "Work Order Type",
+        CRAFT_QUEUE_ADD_WORK_ORDERS_AUTO_QUEUE_CHECKBOX = f.g("Auto Queue ") .. f.bb("Work Orders"),
+        CRAFT_QUEUE_ADD_WORK_ORDERS_AUTO_QUEUE_TOOLTIP =
+        "Automatically queue work orders upon opening a profession table the first time after login",
         CRAFT_QUEUE_PATRON_ORDERS_BUTTON = "Patron Orders",
         CRAFT_QUEUE_GUILD_ORDERS_BUTTON = "Guild Orders",
         CRAFT_QUEUE_PERSONAL_ORDERS_BUTTON = "Personal Orders",
@@ -752,6 +770,9 @@ function CraftSim.LOCAL_EN:GetData()
             " order " ..
             f.bb("Moxie") ..
             " rewards and the first-craft moxie bonus are added to expected profit using your Moxie values below. When disabled, Moxie stays informational in tooltips only.",
+        CRAFT_QUEUE_PATRON_ORDERS_AUTO_UPDATE_MOXIE_VALUES_CHECKBOX = "Auto-update Moxie values from price updates",
+        CRAFT_QUEUE_PATRON_ORDERS_AUTO_UPDATE_MOXIE_VALUES_TOOLTIP =
+        "When enabled, CraftSim recomputes Moxie values whenever recipe prices refresh and only overwrites entries whose computed value changed.",
         CRAFT_QUEUE_PATRON_ORDERS_MOXIE_VALUE_TOOLTIP = "How much you value one unit of this profession's " ..
             f.bb("Moxie") ..
             " reward. Shown in tooltips; also used in expected profit when " ..
@@ -761,12 +782,25 @@ function CraftSim.LOCAL_EN:GetData()
         CRAFT_QUEUE_PATRON_REWARD_VALUES_MENU_BUTTON = "Set Moxie values",
         CRAFT_QUEUE_PATRON_REWARD_VALUES_INTRO = "Set how much you value one unit of each profession's " ..
             f.bb("Moxie") ..
-            ". " ..
-            "Always shown in tooltips; " ..
-            f.bb("expected profit") ..
-            " includes Moxie at these rates when " ..
+            "; grouped rows share one value, and this value is used in expected profit when " ..
             f.bb("Include Moxie in expected profit") ..
-            " is enabled (otherwise gold-only: tips, commission, item rewards).",
+            " is enabled.",
+        CRAFT_QUEUE_PATRON_MOXIE_SURPLUS_SUGGEST_TOOLTIP = "Suggested value per " ..
+            f.bb("Moxie") ..
+            " from your price source, using average yields for Midnight " ..
+            f.bb("Master … Surplus Reagent") ..
+            " turn-ins (tier-2 reagent prices).\n\n" ..
+            f.g("Left-click") ..
+            " to copy this value into the Current column.",
+        CRAFT_QUEUE_PATRON_MOXIE_SURPLUS_NO_DATA_TOOLTIP =
+        "No surplus table for this profession, no price source, or all listed reagents priced at zero.",
+        CRAFT_QUEUE_PATRON_MOXIE_VALUES_HEADER_MOXIE = "Moxie",
+        CRAFT_QUEUE_PATRON_MOXIE_VALUES_HEADER_ITEMS = "Possible Items",
+        CRAFT_QUEUE_PATRON_MOXIE_VALUES_HEADER_CURRENT = "Current",
+        CRAFT_QUEUE_PATRON_MOXIE_VALUES_HEADER_SUGGESTED = "Suggested",
+        CRAFT_QUEUE_PATRON_MOXIE_SURPLUS_TT_REAGENT_TOTAL = "Reagents (expected)",
+        CRAFT_QUEUE_PATRON_MOXIE_SURPLUS_TT_PER_MOXIE = "Per " .. f.bb("Moxie"),
+        PATRON_MOXIE_SURPLUS_BAG_ITEM_TOOLTIP_EXPECTED_VALUE = "Expected Value",
         CRAFT_QUEUE_CLEAR_ALL_BUTTON_LABEL = "Clear All",
         CRAFT_QUEUE_RESTOCK_FAVORITES_SMART_CONCENTRATION_QUEUING = f.bb("Smart ") ..
             f.gold("Concentration") .. f.bb(" Queueing"),
@@ -786,7 +820,8 @@ function CraftSim.LOCAL_EN:GetData()
         CRAFT_QUEUE_RESTOCK_FAVORITES_OFFSET_QUEUE_AMOUNT_LABEL = "Offset Queue Amount: ",
         CRAFT_QUEUE_RESTOCK_FAVORITES_OFFSET_QUEUE_AMOUNT_TOOLTIP =
         "Always add given amount to the number of queued crafts",
-        CRAFT_QUEUE_RESTOCK_FAVORITES_AUTO_SHOPPING_LIST = "Automatically create a Shopping List after Scan",
+        CRAFT_QUEUE_RESTOCK_FAVORITES_AUTO_SHOPPING_LIST = f.g("Automatically Create") ..
+            " " .. f.bb("Shopping List") .. " after queueing",
         CRAFT_QUEUE_CRAFT_BUTTON_ROW_LABEL_WRONG_PROFESSION = "Wrong Profession",
         CRAFT_QUEUE_CRAFT_BUTTON_ROW_LABEL_ON_COOLDOWN = "On Cooldown",
         RECIPE_COOLDOWN_CHARGES_INLINE = "(%d/%d)",
@@ -894,7 +929,7 @@ greater or equal the configured sale rate threshold.
         CRAFT_QUEUE_ORDER_MINIMUM_QUALITY = "\nMinimum Quality: ",
         CRAFT_QUEUE_ORDER_REWARDS = "\nRewards:",
         CRAFT_QUEUE_RESTOCK_FAVORITES_OPTIONS_AUTO_SHOPPING_LIST =
-        "If enabled, CraftSim will automatically create a shopping list after scanning.",
+        "If enabled, CraftSim will automatically create a shopping list after queueing operations.",
         CRAFT_QUEUE_IGNORE_SPARK_RECIPES_CHECKBOX_LABEL = "Ignore " .. f.e("Spark") .. " Recipes",
         CRAFT_QUEUE_IGNORE_SPARK_RECIPES_CHECKBOX_TOOLTIP = "Ignore recipes that require a spark reagent",
         CRAFT_QUEUE_MENU_AUTO_SHOW = f.g("Automatically Open ") .. "when a recipe is queued",
@@ -922,12 +957,16 @@ greater or equal the configured sale rate threshold.
             " is active during stat optimization when the buff is not detected on the player.\n\n" ..
             "This does not add a Shatter-style prerequisite row to the craft queue.",
         CRAFT_QUEUE_TUTORIAL_QUEUE_LIST_TOOLTIP =
-        "Queued recipes are listed here. Left-click a row to open it, right-click for actions.",
-        CRAFT_QUEUE_TUTORIAL_CRAFT_NEXT_TOOLTIP = "Use Craft Next to process the first craftable queued recipe.",
-        CRAFT_QUEUE_HELP = f.bb("Left Click") .. " .. Jump to Recipe\n" ..
-            f.bb("Right Click") .. " .. Open Recipe Options\n" ..
-            f.bb("Middle Click") .. " .. Remove Recipe from Queue",
-
+        "Queued recipes are listed here.\nLeft-click a recipe to navigate to it\nRight-click for actions\nMiddle Mouse Button to remove a recipe",
+        CRAFT_QUEUE_TUTORIAL_CRAFT_NEXT_TOOLTIP = "Use Craft Next to craft the first craftable queued recipe on top",
+        CRAFT_QUEUE_TUTORIAL_QUEUE_BUTTONS_TOOLTIP =
+        "These buttons can be used to automatically queue a range of recipes.\nCraftLists are predefined lists of recipes\nFirst Crafts are recipes with first craft bonuses\nWork Orders are either Patron, Guild, Personal or Public Orders that can be queued based on your selection criteria",
+        CRAFT_QUEUE_TUTORIAL_SHOPPING_LIST_TOOLTIP =
+        "If you have the Auctionator addon loaded, you can use a button here to create a shopping list based on your queued recipes missing reagents.",
+        CRAFT_QUEUE_TUTORIAL_QUICK_ACCESS_BAR_TOOLTIP =
+        "This is a quick access to your upgradeable soulbound finishing reagents (Patron Order Rewards). For Enchanting there is also a quick access button for the shatter buff recipe",
+        CRAFT_QUEUE_TUTORIAL_CRAFT_QUEUE_OPTIONS_TOOLTIP =
+        "Here you can find general options to configure the Craft Queue",
         -- craft lists
         CRAFT_LISTS_TAB_LABEL = "Craft Lists",
         CRAFT_LISTS_QUEUE_BUTTON_LABEL = "Queue Craft Lists",
@@ -948,13 +987,12 @@ greater or equal the configured sale rate threshold.
         CRAFT_LISTS_CREATE_POPUP_TITLE = "Create Craft List",
         CRAFT_LISTS_EXPORT_POPUP_TITLE = "Export Craft List",
         CRAFT_LISTS_IMPORT_POPUP_TITLE = "Import Craft List",
-        CRAFT_LISTS_OPTIONS_ENABLE_CONCENTRATION = CraftSim.GUTIL:IconToText(CraftSim.CONST.CONCENTRATION_ICON, 15, 15) ..
-            f.gold(" Enable Concentration"),
-        CRAFT_LISTS_OPTIONS_OPTIMIZE_CONCENTRATION = "Optimize " .. f.gold("Concentration"),
-        CRAFT_LISTS_OPTIONS_SMART_CONCENTRATION = f.bb("Smart ") .. f.gold("Concentration") .. f.bb(" Queueing"),
+        CRAFT_LISTS_OPTIONS_ENABLE_CONCENTRATION = "Enable Concentration",
+        CRAFT_LISTS_OPTIONS_OPTIMIZE_CONCENTRATION = "Optimize Concentration",
+        CRAFT_LISTS_OPTIONS_SMART_CONCENTRATION = f.bb("Smart ") .. "Concentration" .. f.bb(" Queueing"),
         CRAFT_LISTS_OPTIONS_SMART_CONCENTRATION_TOOLTIP =
         "Queue recipes in order of most concentration value per point, spending all available concentration",
-        CRAFT_LISTS_OPTIONS_OFFSET_CONCENTRATION = "Offset " .. f.gold("Concentration") .. f.bb(" Queue Amount"),
+        CRAFT_LISTS_OPTIONS_OFFSET_CONCENTRATION = "Offset Concentration" .. f.bb(" Queue Amount"),
         CRAFT_LISTS_OPTIONS_OFFSET_CONCENTRATION_TOOLTIP =
             "If enabled, concentration crafts will be queued for the amount of expected crafts based on your " ..
             f.bb("Ingenuity"),
@@ -977,7 +1015,10 @@ greater or equal the configured sale rate threshold.
         CRAFT_LISTS_RESTOCK_SUBTRACT_OWNED_LABEL = "Subtract bags, bank & warbank for craft list restock",
         CRAFT_LISTS_RESTOCK_SUBTRACT_OWNED_TOOLTIP =
         "When enabled, craft list restock queues max(0, target - how many you already have).\n\nTurn off to always queue up to the target number regardless of inventory (for example, craft 20 even if you already have some).",
-        CRAFT_LISTS_OPTIONS_AUTO_SHOPPING_LIST = "Automatically create Shopping List after Queue",
+        CRAFT_LISTS_RESTOCK_INCLUDE_ALT_INVENTORY_LABEL = "Include " .. f.bb("Alt") .. " Inventory",
+        CRAFT_LISTS_RESTOCK_INCLUDE_ALT_INVENTORY_TOOLTIP =
+        "When enabled, alt characters' inventory is also subtracted from the restock target.",
+        CRAFT_LISTS_OPTIONS_AUTO_SHOPPING_LIST = "Automatically create Shopping List after queueing",
         CRAFT_LISTS_OPTIONS_UPDATE_LAST_CRAFTING_COST = "Update " .. f.bb("Last Crafting Cost") .. " DB",
         CRAFT_LISTS_OPTIONS_UPDATE_LAST_CRAFTING_COST_TOOLTIP = "If enabled, the " .. f.bb("Last Crafting Cost") ..
             " database is updated for each recipe when queuing craft lists.\n\nThis allows querying the last known average crafting cost per item via the CraftSim API.",

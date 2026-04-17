@@ -17,7 +17,7 @@
 ## Notes-zhCN: 根据您的专业统计数据和其他工具计算平均利润
 ## Notes-zhTW: 根據您的專業技能統計資料和其他工具計算平均利潤
 ## Author: genju
-## Version: 25.1.0
+## Version: 26.1.0
 ## X-Curse-Project-ID: 705015
 ## X-Wago-ID: 0mNwaPKo
 ## X-WoWI-ID: 26519
@@ -25,7 +25,7 @@
 ## IconTexture: Interface\Icons\inv_misc_coin_02
 ## SavedVariables: CraftSimDB
 ## Dependencies: Blizzard_Professions
-## OptionalDeps: Auctionator, TradeSkillMaster, RECrystallize, OribosExchange
+## OptionalDeps: Auctionator, TradeSkillMaster, RECrystallize, OribosExchange, Syndicator
 
 embeds.xml
 
@@ -33,13 +33,14 @@ Init/GLibs.lua
 
 Util/Const.lua
 
-Modules/Debug/Debug.lua
-Modules/Debug/UI.lua
+Debug/Debug.lua
+Debug/UI.lua
 
 Util/Util.lua
 
 DB/DB.lua
 DB/optionsDB.lua
+DB/patronMoxieValuesDB.lua
 DB/optimizationOptionsDB.lua
 DB/itemCountDB.lua
 DB/craftQueueDB.lua
@@ -69,8 +70,10 @@ Init/Init.lua
 Init/Slash.lua
 
 Pricing/ProfitCalculation.lua
-Pricing/PriceAPIs.lua
-Pricing/PriceSource.lua
+
+DataSource/PriceAPIs.lua
+DataSource/PriceSource.lua
+DataSource/InventorySource.lua
 
 Modules/Modules.lua
 
@@ -156,6 +159,7 @@ Data/ConcentrationCurveData.lua
 Data/OptionalReagentData.lua
 Data/OptionalCurrencyReagentData.lua
 Data/News.lua
+Data/PatronMoxieSurplusData.lua
 
 Data/SpecializationData/Dragonflight/Alchemy.lua
 Data/SpecializationData/Dragonflight/Blacksmithing.lua

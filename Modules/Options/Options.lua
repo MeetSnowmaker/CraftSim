@@ -36,6 +36,7 @@ function CraftSim.OPTIONS:Init()
             end,
             function(v)
                 CraftSim.DB.OPTIONS:Save(optKey, v)
+                GUTIL:TriggerCustomEvent("CRAFTSIM_SETTINGS_UPDATED", optKey, v)
             end)
         if onChanged then
             s:SetValueChangedCallback(function(_, v)
@@ -60,6 +61,7 @@ function CraftSim.OPTIONS:Init()
             function(v)
                 local out = valueRoundDecimals and GUTIL:Round(v, valueRoundDecimals) or v
                 CraftSim.DB.OPTIONS:Save(optKey, out)
+                GUTIL:TriggerCustomEvent("CRAFTSIM_SETTINGS_UPDATED", optKey, out)
             end)
         local opts = Settings.CreateSliderOptions(minV, maxV, step)
         if valueRoundDecimals ~= nil then
@@ -110,6 +112,37 @@ function CraftSim.OPTIONS:Init()
             L("OPTIONS_GENERAL_NO_PRICE_SOURCE"), nil))
     end
 
+    local inventoryAddons = CraftSim.INVENTORY_APIS:GetAvailableInventoryAddons()
+    if #inventoryAddons > 1 then
+        local supportedInventoryTooltip = L("OPTIONS_GENERAL_SUPPORTED_INVENTORY_SOURCES") ..
+            "\n\n" .. table.concat(CraftSim.CONST.SUPPORTED_INVENTORY_ADDONS, "\n")
+        local defaultInventorySource = CraftSim.INVENTORY_API.name or inventoryAddons[1]
+        local invDdSetting = Settings.RegisterProxySetting(mainCategory, "CraftSimOpt_INVENTORY_SOURCE",
+            Settings.VarType.String,
+            L("OPTIONS_GENERAL_INVENTORY_SOURCE"), defaultInventorySource,
+            function()
+                return CraftSim.INVENTORY_API.name
+            end,
+            function(v)
+                CraftSim.INVENTORY_APIS:SwitchAPIByAddonName(v)
+                CraftSim.DB.OPTIONS:Save(GO.INVENTORY_SOURCE, v)
+            end)
+        local function inventoryDropdownOptions()
+            local t = {}
+            for _, n in ipairs(inventoryAddons) do
+                t[#t + 1] = { controlType = Settings.ControlType.Radio, label = n, text = n, value = n }
+            end
+            return t
+        end
+        Settings.CreateDropdown(mainCategory, invDdSetting, inventoryDropdownOptions, supportedInventoryTooltip)
+    elseif #inventoryAddons == 1 then
+        Settings.RegisterInitializer(mainCategory, CreateSettingsListSectionHeaderInitializer(
+            L("OPTIONS_GENERAL_CURRENT_INVENTORY_SOURCE") .. " " .. tostring(CraftSim.INVENTORY_API.name), nil))
+    else
+        Settings.RegisterInitializer(mainCategory, CreateSettingsListSectionHeaderInitializer(
+            L("OPTIONS_GENERAL_NO_INVENTORY_SOURCE"), nil))
+    end
+
     proxyBool("CraftSimOpt_SHOW_PROFIT_PERCENTAGE", GO.SHOW_PROFIT_PERCENTAGE,
         L("OPTIONS_GENERAL_SHOW_PROFIT"),
         L("OPTIONS_GENERAL_SHOW_PROFIT_TOOLTIP"))
@@ -129,6 +162,9 @@ function CraftSim.OPTIONS:Init()
     proxyBool("CraftSimOpt_MONEY_FORMAT_USE_TEXTURES", GO.MONEY_FORMAT_USE_TEXTURES,
         L("OPTIONS_GENERAL_COIN_MONEY_FORMAT_CHECKBOX") .. GUTIL:FormatMoney(123456789, nil, nil, true, true),
         L("OPTIONS_GENERAL_COIN_MONEY_FORMAT_TOOLTIP"))
+    proxyBool("CraftSimOpt_SHOW_TUTORIAL_BUTTONS", GO.SHOW_TUTORIAL_BUTTONS,
+        L("OPTIONS_GENERAL_SHOW_TUTORIAL_BUTTONS_CHECKBOX"),
+        L("OPTIONS_GENERAL_SHOW_TUTORIAL_BUTTONS_TOOLTIP"))
 
     -- Modules
     regSection(L("OPTIONS_MODULES_TAB"), nil)
@@ -165,7 +201,7 @@ function CraftSim.OPTIONS:Init()
         L("OPTIONS_TOOLTIP_REGISTERED_CRAFTERS_MAX"), L("OPTIONS_TOOLTIP_REGISTERED_CRAFTERS_MAX_SUBLABEL"), 1, 50, 1, 0)
 
     -- TSM (embedded panel; `CraftSimOptionsInitTSMPanel` runs from template OnLoad)
-    if select(2, C_AddOns.IsAddOnLoaded("TradeSkillMaster")) then
+    if C_AddOns.IsAddOnLoaded("TradeSkillMaster") then
         regSection(L("OPTIONS_TSM_TAB"), L("OPTIONS_TSM_SECTION_TOOLTIP"))
         Settings.RegisterInitializer(mainCategory,
             Settings.CreatePanelInitializer("CraftSimSettingsTsmPanelTemplate", {}))

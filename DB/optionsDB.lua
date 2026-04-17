@@ -3,7 +3,7 @@ local CraftSim = select(2, ...)
 
 local GUTIL = CraftSim.GUTIL
 
-local print = CraftSim.DEBUG:RegisterDebugID("Database.optionsDB")
+local Logger = CraftSim.DEBUG:RegisterLogger("optionsDB")
 
 ---@class CraftSim.DB
 CraftSim.DB = CraftSim.DB
@@ -311,4 +311,19 @@ end
 
 function CraftSim.DB.OPTIONS.MIGRATION:M_14_15_Remove_unused_global_craftlists_option()
     CraftSimDB.optionsDB.data["CRAFT_LISTS_RESTOCK_SUBTRACT_OWNED"] = nil
+end
+
+function CraftSim.DB.OPTIONS.MIGRATION:M_15_16_Rename_CraftQueue_Auto_Shopping_List_Option()
+    local oldKey = "CRAFTQUEUE_RESTOCK_FAVORITES_AUTO_SHOPPING_LIST"
+    local newKey = "CRAFTQUEUE_AUTO_SHOPPING_LIST"
+
+    if CraftSimDB.optionsDB.data[oldKey] ~= nil and CraftSimDB.optionsDB.data[newKey] == nil then
+        CraftSimDB.optionsDB.data[newKey] = CraftSimDB.optionsDB.data[oldKey]
+    end
+
+    CraftSimDB.optionsDB.data[oldKey] = nil
+end
+
+function CraftSim.DB.OPTIONS.MIGRATION:M_16_17_Remove_DebugID_SavedVariable()
+    CraftSimDB.optionsDB.data["DEBUG_IDS"] = nil
 end
